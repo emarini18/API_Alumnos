@@ -14,9 +14,11 @@ const taller = sequelize.define('taller', {
     IMG_URL_TALLER: {
         type: DataTypes.STRING(200)
     },
-
-    DESCRIP_TALLER: {
+    TITULO_TALLER: {
         type: DataTypes.STRING(100)
+    },
+    DESCRIP_TALLER: {
+        type: DataTypes.STRING(250)
     },
 
     ID_PROFESOR: {

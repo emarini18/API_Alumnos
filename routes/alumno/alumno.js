@@ -1,7 +1,11 @@
 const router = require('express').Router();
 const Alumnos = require('../../models/alumnos');
 const jwt = require('jsonwebtoken');
-const config = require('../../config/config');
+const secret = require('../../config/config');
+const { validarPassword, verifyToken } = require('../../controllers/alumno.controllers');
+
+// Database Connection
+require('../../database/db');
 
 router.get('/', async (req, res) => {
     // Recuperar todos los  valores
@@ -9,68 +13,121 @@ router.get('/', async (req, res) => {
     res.json(user);
 });
 
-// Méotdo Registrarse
+
+// Ruta Registrarse
 router.post('/registrar', async (req, res, next) => {
 
     const { nombre, apellido, username, password,
         dni, email, celular } = req.body;
 
     const alumnito = await Alumnos.create({
-        NOMB_ALUMNO:nombre, 
-        APEL_ALUMNO:apellido, 
-        USER_ALUMNO:username, 
-        PASS_ALUMNO:password,
-        DNI_ALUMNO:dni,
-        CORREO_ALUMNO:email, 
-        CEL_ALUMNO:celular
-    },{
-        fields:['NOMB_ALUMNO', 'APEL_ALUMNO','USER_ALUMNO',
-        'PASS_ALUMNO','DNI_ALUMNO','CORREO_ALUMNO','CEL_ALUMNO']
+        NOMB_ALUMNO: nombre,
+        APEL_ALUMNO: apellido,
+        USER_ALUMNO: username,
+        PASS_ALUMNO: password,
+        DNI_ALUMNO: dni,
+        CORREO_ALUMNO: email,
+        CEL_ALUMNO: celular
+    }, {
+        fields: ['NOMB_ALUMNO', 'APEL_ALUMNO', 'USER_ALUMNO',
+            'PASS_ALUMNO', 'DNI_ALUMNO', 'CORREO_ALUMNO', 'CEL_ALUMNO']
     });
 
 
     const payload = {
-        "id":alumnito.USER_ALUMNO
+        "id": alumnito.USER_ALUMNO
     }
 
     // Token
-    const token = jwt.sign( 
-        { id: payload.id }, 
-        config.secret,
-        { 
-            expiresIn: 60 * 60 * 24 } //Tiempo duracion 01 token
-        );
+    const token = jwt.sign(
+        { id: payload.id },
+        secret,
+        {
+            expiresIn: 60 * 60 * 24
+        } //Tiempo duracion 01 token
+    );
 
     // Enviar status y valor del token
-    res.json( {
-        auth:true,
+    res.json({
+        auth: true,
         token
     });
 
-    // res.json(alumnito);
-    console.log(payload);
 });
 
+
+// Ruta Login
 router.post('/login', async (req, res, next) => {
-    res.json('login');
-});
 
-router.get('/profile', async (req, res, next) => {
+    const { username, password } = req.body;
+    // console.log(username, password);
 
-    // Obtener el token que llega en la cabezera
-    const token = req.headers['x-access-token'];
+    const alumnito = await Alumnos.findOne({
+        where: {
+            USER_ALUMNO: username
+        }
+    });
 
-    if(!token){
-        return res.status(401).json({
-            auth:false,
-            message:'Token no contenido'
+    if (!alumnito) {
+        return res.status(404).json({
+            error: 'El usuario no existe'
         });
     }
 
-    const decifrarToken = jwt.verify( token, config.secret );
-    console.log(decifrarToken);
+    console.log(alumnito);
 
-    res.json('profile');
+    const passwordValidator =  validarPassword(password, alumnito.dataValues.PASS_ALUMNO);
+     if(!passwordValidator){
+        return res.status(401).json({
+            auth: false,
+            token: null
+        });
+    }
+
+
+    const payload = {
+        "id": alumnito.USER_ALUMNO
+    }
+
+    const token = jwt.sign(
+        { id: payload.id },
+        secret,
+        {
+             //Tiempo duracion token
+            expiresIn: 60 * 60 * 24
+        }
+    );
+
+    // Enviar status y valor del token
+    res.json({
+        auth: true,
+        token
+    });
+    
+});
+
+
+
+
+// Ruta Obtener perfil
+router.get('/profile', verifyToken, async (req, res, next) => {
+
+    console.log('req.userId',req.userId);
+    const alumnito = await Alumnos.findOne({
+        attributes: ['NOMB_ALUMNO', 'APEL_ALUMNO', 'USER_ALUMNO',
+            'DNI_ALUMNO', 'CORREO_ALUMNO', 'CEL_ALUMNO', 'IMG_ALUMNO'],
+        where: {
+            USER_ALUMNO: req.userId
+        }
+    });
+
+    // Si el alumno no existe
+    if (!alumnito) {
+        return res.status(404).send('Alumno no encontrado');
+    }
+
+    // Si el alumno existe, enviartlo como json
+    res.json(alumnito);
 })
 
 

@@ -37,6 +37,9 @@ const alumno = sequelize.define('alumno',{
     },
     NIVEL_USUARIO:{
         type: DataTypes.INTEGER
+    },
+    IMG_ALUMNO:{
+        type: DataTypes.STRING(100)
     }
 },
 
@@ -44,8 +47,6 @@ const alumno = sequelize.define('alumno',{
     timestamps: false,
     tableName:'ALUMNOS'
 });
-
-
 
 
 module.exports=alumno;

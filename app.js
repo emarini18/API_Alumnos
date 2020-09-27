@@ -10,9 +10,6 @@ app.use(cors());
 // Puerto por defecto
 const port = process.env.PORT || 3000;
 
-// Database Connection
-require('./database/db');
-
 // MIDDLEWERES
 // parse application/json
 app.use(bodyParser.json());
