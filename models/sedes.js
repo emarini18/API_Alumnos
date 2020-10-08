@@ -8,6 +8,9 @@ const sede = sequelize.define('sede',{
     },
     DESCRIP_SEDE:{
         type: DataTypes.STRING(100)
+    },
+    IMG_SEDE:{
+        type: DataTypes.STRING(200)
     }
 },
 
