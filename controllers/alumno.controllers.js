@@ -10,24 +10,29 @@ function validarPassword (passwordBody, passwordDB) {
 }
 
 
-function verifyToken (req, res, next){
+// function verifyToken (req, res, next){
 
-    const token = req.headers['authorization'].split(" ")[1];
+//     const token = req.headers['authorization'].split(" ")[1];
 
-    if (!token) {
-        return res.status(401).json({
-            auth: false,
-            message: 'Token no contenido'
-        });
-    }
+//     if (!token) {
+//         return res.status(401).json({
+//             auth: false,
+//             message: 'Token no contenido'
+//         });
+//     }
 
-    const decifrarToken = jwt.verify(token, secret);
-    req.userId = decifrarToken.id;
-    next();
-}
+//     const decifrarToken = jwt.verify(token, secret);
+//     req.userId = decifrarToken.id;
+//     next();
+// }
 
+// function validarUsuario( req, res, next ){
+//     const usuarioId = req.params.id;
+
+    
+// }
 
 module.exports = {
-    validarPassword,
-    verifyToken
+    validarPassword
+    // verifyToken
 };

@@ -33,7 +33,7 @@ router.post('/registrar', async (req, res, next) => {
             'PASS_ALUMNO', 'DNI_ALUMNO', 'CORREO_ALUMNO', 'CEL_ALUMNO']
     });
 
-
+/*
     const payload = {
         "id": alumnito.USER_ALUMNO
     }
@@ -52,7 +52,13 @@ router.post('/registrar', async (req, res, next) => {
         auth: true,
         token
     });
+*/
 
+// Enviar status y valor del token
+res.json({
+    auth: true,
+    id:alumnito.USER_ALUMNO
+});
 });
 
 
@@ -84,7 +90,7 @@ router.post('/login', async (req, res, next) => {
         });
     }
 
-
+    /*
     const payload = {
         "id": alumnito.USER_ALUMNO
     }
@@ -103,21 +109,30 @@ router.post('/login', async (req, res, next) => {
         auth: true,
         token
     });
-    
+    */
+
+    // Enviar status y valor del token
+    res.json({
+        auth: true,
+        id:alumnito.USER_ALUMNO
+    });
+
 });
 
 
 
-
+// router.get('/profile', verifyToken, async (req, res, next)
 // Ruta Obtener perfil
-router.get('/profile', verifyToken, async (req, res, next) => {
+router.get('/profile/:id', async (req, res, next) => {
+    console.log('parametros', req.params);
 
-    console.log('req.userId',req.userId);
+    // console.log('req.userId',req.userId);
     const alumnito = await Alumnos.findOne({
         attributes: ['NOMB_ALUMNO', 'APEL_ALUMNO', 'USER_ALUMNO',
             'DNI_ALUMNO', 'CORREO_ALUMNO', 'CEL_ALUMNO', 'IMG_ALUMNO'],
         where: {
-            USER_ALUMNO: req.userId
+            // USER_ALUMNO: req.userId
+            USER_ALUMNO:req.params.id
         }
     });
 
